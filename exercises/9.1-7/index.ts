@@ -1,4 +1,3 @@
-// index.ts
 import express from 'express';
 import { calculateBmi } from './bmiCalculator';
 import { calculateExercises } from './exerciseCalculator';
@@ -6,86 +5,60 @@ import { calculateExercises } from './exerciseCalculator';
 const app = express();
 app.use(express.json());
 
-// ---------- Helpers de validación ----------
+// GET /hello
+app.get('/hello', (_req, res) => {
+  res.send('Hello, Full Stack!');
+});
 
-
-const parseBmiQuery = (q: unknown): { height: number; weight: number } => {
-  if (!q || typeof q !== 'object') {
-    throw new Error('parameters missing');
-  }
-  const obj = q as Record<string, unknown>;
-  const height = Number(obj.height);
-  const weight = Number(obj.weight);
-
-  if (obj.height === undefined || obj.weight === undefined) {
-    throw new Error('parameters missing');
-  }
-  if (Number.isNaN(height) || Number.isNaN(weight)) {
-    throw new Error('malformatted parameters');
-  }
-  return { height, weight };
-};
-
-
-const toNumberArray = (arr: unknown): number[] => {
-  if (!Array.isArray(arr)) throw new Error('malformatted parameters');
-  const nums = arr.map((v) => Number(v));
-  if (nums.some((n) => Number.isNaN(n))) throw new Error('malformatted parameters');
-  return nums;
-};
-
-
-const parseExercisesBody = (
-  body: unknown
-): { daily_exercises: number[]; target: number } => {
-  if (!body || typeof body !== 'object') {
-    throw new Error('parameters missing');
-  }
-  const obj = body as Record<string, unknown>;
-
-  if (obj.daily_exercises === undefined || obj.target === undefined) {
-    throw new Error('parameters missing');
-  }
-
-  const daily_exercises = toNumberArray(obj.daily_exercises);
-  const target = Number(obj.target);
-
-  if (Number.isNaN(target)) {
-    throw new Error('malformatted parameters');
-  }
-
-  return { daily_exercises, target };
-};
-
-
+// GET /bmi
 app.get('/bmi', (req, res) => {
-  try {
-    const { height, weight } = parseBmiQuery(req.query);
-    const bmi = calculateBmi(height, weight);
-    return res.json({ weight, height, bmi });
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : 'malformatted parameters';
-    const status = msg === 'parameters missing' ? 400 : 400;
-    return res.status(status).json({ error: msg });
+  const { height, weight } = req.query;
+
+  if (!height || !weight) {
+    return res.status(400).json({ error: 'parameters missing' });
   }
+
+  const h = Number(height);
+  const w = Number(weight);
+
+  if (isNaN(h) || isNaN(w)) {
+    return res.status(400).json({ error: 'malformatted parameters' });
+  }
+
+  const bmi = calculateBmi(h, w);
+
+  return res.json({
+    weight: w,
+    height: h,
+    bmi,
+  });
 });
 
-
+// POST /exercises
 app.post('/exercises', (req, res) => {
-  try {
-    const { daily_exercises, target } = parseExercisesBody(req.body);
-    const result = calculateExercises(daily_exercises, target);
-    return res.json(result);
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : 'malformatted parameters';
-    // Solo dos tipos de error según enunciado:
-    // "parameters missing" o "malformatted parameters"
-    const status = msg === 'parameters missing' ? 400 : 400;
-    return res.status(status).json({ error: msg });
+  const { daily_exercises, target } = req.body as {
+    daily_exercises?: unknown;
+    target?: unknown;
+  };
+
+  if (!daily_exercises || target === undefined) {
+    return res.status(400).json({ error: 'parameters missing' });
   }
+
+  if (!Array.isArray(daily_exercises) || isNaN(Number(target))) {
+    return res.status(400).json({ error: 'malformatted parameters' });
+  }
+
+  const hours = daily_exercises.map((d) => Number(d));
+  if (hours.some((h) => isNaN(h))) {
+    return res.status(400).json({ error: 'malformatted parameters' });
+  }
+
+  const result = calculateExercises(hours, Number(target));
+  return res.json(result);
 });
 
-const PORT = 3002;
+const PORT = 3003;
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
   console.log(`Server running on port ${PORT}`);
