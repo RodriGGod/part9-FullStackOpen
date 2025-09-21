@@ -1,10 +1,18 @@
-
-
-const express = require('express');
+import express from 'express';
+import { calculator, Operation } from './calculator';
 const app = express();
 
-app.get('/ping', (req, res) => {
+app.get('/ping', (_req, res) => {
   res.send('pong');
+});
+
+app.post('/calculate', (req, res) => {
+  const { value1, value2, op } = req.body;
+
+  const operation = op as Operation;
+
+  const result = calculator(Number(value1), Number(value2), operation);
+  res.send({ result });
 });
 
 const PORT = 3003;
