@@ -13,7 +13,6 @@ export const calculateExercises = (dailyHours: number[], target: number): Result
   const trainingDays = dailyHours.filter(d => d > 0).length;
   const average = dailyHours.reduce((a, b) => a + b, 0) / periodLength;
 
-
   let rating: number;
   let ratingDescription: string;
 
@@ -39,5 +38,33 @@ export const calculateExercises = (dailyHours: number[], target: number): Result
   };
 };
 
+// --- Manejo de argumentos desde CLI ---
+if (require.main === module) {
+  try {
+    const [, , targetArg, ...restArgs] = process.argv;
 
-console.log(calculateExercises([3, 0, 2, 4.5, 0, 3, 1], 2));
+    if (!targetArg || restArgs.length === 0) {
+      throw new Error("Please provide a target and at least one day of exercises.");
+    }
+
+    const target = Number(targetArg);
+    const dailyHours = restArgs.map(n => {
+      if (isNaN(Number(n))) {
+        throw new Error(`Value "${n}" is not a number.`);
+      }
+      return Number(n);
+    });
+
+    if (isNaN(target)) {
+      throw new Error("Target must be a number.");
+    }
+
+    console.log(calculateExercises(dailyHours, target));
+  } catch (error: unknown) {
+    let errorMessage = "Something bad happened.";
+    if (error instanceof Error) {
+      errorMessage += " Error: " + error.message;
+    }
+    console.log(errorMessage);
+  }
+}

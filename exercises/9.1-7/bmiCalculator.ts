@@ -1,3 +1,4 @@
+// bmiCalculator.ts
 
 export const calculateBmi = (height: number, weight: number): string => {
   const heightInMeters = height / 100;
@@ -14,5 +15,26 @@ export const calculateBmi = (height: number, weight: number): string => {
   }
 };
 
-// Ejemplo de uso:
-console.log(calculateBmi(180, 74));
+// --- Manejo de argumentos desde CLI ---
+if (require.main === module) {
+  try {
+    const [, , arg1, arg2] = process.argv;
+    if (!arg1 || !arg2) {
+      throw new Error("Please provide height (cm) and weight (kg).");
+    }
+    const height = Number(arg1);
+    const weight = Number(arg2);
+
+    if (isNaN(height) || isNaN(weight)) {
+      throw new Error("Height and weight must be numbers.");
+    }
+
+    console.log(calculateBmi(height, weight));
+  } catch (error: unknown) {
+    let errorMessage = "Something bad happened.";
+    if (error instanceof Error) {
+      errorMessage += " Error: " + error.message;
+    }
+    console.log(errorMessage);
+  }
+}
