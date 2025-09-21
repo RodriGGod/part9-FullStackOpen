@@ -1,9 +1,9 @@
+import express from 'express';
 
 
-const express = require('express');
 const app = express();
 
-app.get('/ping', (req, res) => {
+app.get('/ping', (_req, res) => {
   res.send('pong');
 });
 
