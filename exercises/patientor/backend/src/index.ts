@@ -1,21 +1,19 @@
+// src/index.ts
 import express from 'express';
-import diagnoseRouter from './routes/diagnoses';
 import patientsRouter from './routes/patients';
-import cors from 'cors';
+import diagnosesRouter from './routes/diagnoses'; // si ya lo tienes
+
 const app = express();
-app.use(cors());
-app.use(express.json());
-
-app.use('/api/diagnoses', diagnoseRouter);
-app.use('/api/patients', patientsRouter);
-
-const PORT = 3001;
+app.use(express.json()); // ¡importante para leer req.body JSON!
 
 app.get('/api/ping', (_req, res) => {
-  console.log('someone pinged here');
   res.send('pong');
 });
 
+app.use('/api/patients', patientsRouter);
+app.use('/api/diagnoses', diagnosesRouter); // si procede
+
+const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

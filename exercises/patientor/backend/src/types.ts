@@ -6,15 +6,24 @@ export interface DiagnoseEntry{
 
 export type DiagnoseEntryWithoutLatin = Omit<DiagnoseEntry, 'latin'>;
 
+// src/types.ts
+export enum Gender {
+  Male = 'male',
+  Female = 'female',
+  Other = 'other'
+}
+
 export interface Patient {
   id: string;
   name: string;
-  dateOfBirth: string;
+  dateOfBirth: string;  // ISO date string
   ssn: string;
-  gender: string;       // en este ejercicio lo dejamos como string
+  gender: Gender;
   occupation: string;
-  // si ya tienes otros campos (p.ej., entries), añádelos aquí
 }
 
-// Tipo que el backend expone al frontend (sin ssn)
-export type PublicPatient = Omit<Patient, 'ssn'>;
+// Lo que recibe el POST (sin id)
+export type NewPatient = Omit<Patient, 'id'>;
+
+// Para listar sin datos sensibles
+export type NonSensitivePatient = Omit<Patient, 'ssn'>;

@@ -1,10 +1,32 @@
 // src/services/patientService.ts
-import patientsData from '../data/patientsData';
-import { Patient, PublicPatient } from '../types';
+import { v1 as uuid } from 'uuid';
+import patientsData from '../data/patientsData'; // tu JSON/TS con pacientes iniciales
+import { Patient, NewPatient, NonSensitivePatient } from '../types';
 
-const patients: Patient[] = patientsData;
+const patients: Patient[] = patientsData as Patient[];
 
-export const getPublicPatients = (): PublicPatient[] => {
-  // quita ssn con destructuring y devuelve tipo seguro
-  return patients.map(({ ssn, ...publicData }) => publicData);
+const getPatients = (): Patient[] => patients;
+
+const getNonSensitivePatients = (): NonSensitivePatient[] =>
+  patients.map(({ id, name, dateOfBirth, gender, occupation }) => ({
+    id,
+    name,
+    dateOfBirth,
+    gender,
+    occupation
+  }));
+
+const addPatient = (newPatient: NewPatient): Patient => {
+  const patientToAdd: Patient = {
+    id: uuid(),
+    ...newPatient
+  };
+  patients.push(patientToAdd);
+  return patientToAdd;
+};
+
+export default {
+  getPatients,
+  getNonSensitivePatients,
+  addPatient
 };
