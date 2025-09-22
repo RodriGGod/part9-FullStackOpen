@@ -1,28 +1,19 @@
-import diaryData from '../data/entries';
-import { NonSensitiveDiaryEntry, DiaryEntry } from '../types';
+// src/diaryService.ts
+import { DiaryEntry, NewDiaryEntry } from '../types';
 
-
-const diaries: DiaryEntry[] = diaryData as DiaryEntry[];
+let diaries: DiaryEntry[] = []; // o tu fuente real
 
 const getEntries = (): DiaryEntry[] => {
   return diaries;
 };
 
-const getNonSensitiveEntries = (): NonSensitiveDiaryEntry[] => {
-  return diaries.map(({ id, date, weather, visibility }) => ({
-    id,
-    date,
-    weather,
-    visibility,
-  }));
+const addDiary = (entry: NewDiaryEntry): DiaryEntry => {
+  const newEntry: DiaryEntry = {
+    id: Math.max(0, ...diaries.map(d => d.id)) + 1, // o UUID
+    ...entry,
+  };
+  diaries.push(newEntry);
+  return newEntry;
 };
 
-const addDiary = () => {
-  return null;
-};
-
-export default {
-  getEntries,
-  addDiary,
-  getNonSensitiveEntries
-};
+export default { getEntries, addDiary };

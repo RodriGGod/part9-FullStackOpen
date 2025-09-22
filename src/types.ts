@@ -1,15 +1,26 @@
-export type Weather = 'sunny' | 'rainy' | 'cloudy' | 'windy' | 'stormy';
-
-export type Visibility = 'great' | 'good' | 'ok' | 'poor';
-
-export interface DiaryEntry {
-  id: number;
-  date: string;
-  weather: Weather;
-  visibility: Visibility;
-  comment?: string;
+// src/types.ts
+export enum Weather {
+  Sunny = 'sunny',
+  Rainy = 'rainy',
+  Cloudy = 'cloudy',
+  Stormy = 'stormy',
+  Windy = 'windy',
 }
 
+export enum Visibility {
+  Great = 'great',
+  Good = 'good',
+  Ok = 'ok',
+  Poor = 'poor',
+}
 
-export type NonSensitiveDiaryEntry = Omit<DiaryEntry, 'comment'>;
+export interface NewDiaryEntry {
+  date: string;            // p.ej. '2025-09-22'
+  weather: Weather;
+  visibility: Visibility;
+  comment: string;
+}
 
+export interface DiaryEntry extends NewDiaryEntry {
+  id: number;              // o string, como uses en tu servicio
+}
