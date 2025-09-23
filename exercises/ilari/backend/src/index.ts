@@ -1,18 +1,25 @@
-// src/index.ts
 import express from 'express';
-import diaryRouter from './routes/diaries'; // o './routes/diaries'
-import cors from "cors";
-
+import cors from 'cors';
+import diaryService from './services/diaryService';
+import toNewDiaryEntry from './utils';
 
 const app = express();
-app.use(express.json());             // <── middleware para parsear JSON
-app.use(cors({ origin: "http://localhost:5173" }));
+app.use(cors({ origin: 'http://localhost:5173' }));
+app.use(express.json()); // 👈 imprescindible
 
-
-const PORT = 3000;
-
-app.use('/api/diaries', diaryRouter);
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.get('/api/diaries', (_req, res) => {
+  res.json(diaryService.getNonSensitiveEntries()); // o getEntries() si quieres comment
 });
+
+app.post('/api/diaries', (req, res) => {
+  try {
+    const newEntry = toNewDiaryEntry(req.body);
+    const added = diaryService.addDiary(newEntry);
+    res.json(added);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : 'Unknown error';
+    res.status(400).send({ error: msg });
+  }
+});
+
+app.listen(3000, () => console.log('Server on 3000'));

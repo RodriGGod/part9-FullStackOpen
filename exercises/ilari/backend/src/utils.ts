@@ -1,33 +1,18 @@
-// src/utils.ts
 import { NewDiaryEntry, Weather, Visibility } from './types';
 
-/**
- * Type guards
- */
-const isString = (text: unknown): text is string => {
-  return typeof text === 'string' || text instanceof String;
-};
+const isString = (text: unknown): text is string =>
+  typeof text === 'string' || text instanceof String;
 
-const isDate = (date: string): boolean => {
-  return Boolean(Date.parse(date));
-};
+const isDate = (date: string): boolean => Boolean(Date.parse(date));
+const isWeather = (param: string): param is Weather =>
+  Object.values(Weather).map(String).includes(param);
+const isVisibility = (param: string): param is Visibility =>
+  Object.values(Visibility).map(String).includes(param);
 
-const isWeather = (param: string): param is Weather => {
-  // Permite que el check esté SIEMPRE sincronizado con el enum
-  return Object.values(Weather).map(String).includes(param);
-};
-
-const isVisibility = (param: string): param is Visibility => {
-  return Object.values(Visibility).map(String).includes(param);
-};
-
-/**
- * Parsers
- */
-const parseComment = (comment: unknown): string => {
-  if (!comment || !isString(comment)) {
-    throw new Error('Incorrect or missing comment');
-  }
+const parseComment = (comment: unknown): string | undefined => {
+  // 👇 ahora es opcional
+  if (comment === undefined) return undefined;
+  if (!isString(comment)) throw new Error('Incorrect comment');
   return comment;
 };
 
@@ -52,23 +37,21 @@ const parseVisibility = (visibility: unknown): Visibility => {
   return visibility;
 };
 
-/**
- * Constructor seguro desde req.body (unknown) → NewDiaryEntry
- */
 const toNewDiaryEntry = (object: unknown): NewDiaryEntry => {
   if (!object || typeof object !== 'object') {
     throw new Error('Incorrect or missing data');
   }
 
-  // extraemos y validamos campo a campo
-  const newEntry: NewDiaryEntry = {
+  const base: NewDiaryEntry = {
     date: parseDate((object as { date: unknown }).date),
     weather: parseWeather((object as { weather: unknown }).weather),
     visibility: parseVisibility((object as { visibility: unknown }).visibility),
-    comment: parseComment((object as { comment: unknown }).comment),
   };
 
-  return newEntry;
+  const comment = parseComment((object as { comment?: unknown }).comment);
+  if (comment !== undefined) base.comment = comment;
+
+  return base;
 };
 
 export default toNewDiaryEntry;

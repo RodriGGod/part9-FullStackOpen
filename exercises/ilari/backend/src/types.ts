@@ -14,13 +14,14 @@ export enum Visibility {
   Poor = 'poor',
 }
 
-export interface NewDiaryEntry {
-  date: string;            // p.ej. '2025-09-22'
+
+
+export interface DiaryEntry {
+  id: number;
+  date: string;
   weather: Weather;
   visibility: Visibility;
-  comment: string;
+  comment?: string;   // <-- opcional
 }
 
-export interface DiaryEntry extends NewDiaryEntry {
-  id: number;              // o string, como uses en tu servicio
-}
+export type NewDiaryEntry = Omit<DiaryEntry, "id">;
