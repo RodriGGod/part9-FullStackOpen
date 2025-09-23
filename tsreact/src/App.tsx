@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import axios from "axios";
 import { Note } from "./types";
-import { getAllNotes, createNote } from './noteService';
+
 
 
 
