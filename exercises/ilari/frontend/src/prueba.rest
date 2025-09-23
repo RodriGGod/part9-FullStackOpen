@@ -1,0 +1,24 @@
+### Crear entrada válida
+POST http://localhost:3000/api/diaries
+Content-Type: application/json
+
+{
+  "date": "2025-09-23",
+  "weather": "sunny",
+  "visibility": "good",
+  "comment": "first flight test"
+}
+
+### Crear entrada con visibility inválida
+POST http://localhost:3000/api/diaries
+Content-Type: application/json
+
+{
+  "date": "2025-09-23",
+  "weather": "sunny",
+  "visibility": "best ever",
+  "comment": "invalid visibility"
+}
+
+### Obtener todos los diarios
+GET http://localhost:3000/api/diaries

@@ -1,7 +1,6 @@
 import { DiaryEntry, NewDiaryEntry } from "../types";
 
-// Usa la que tengas: "/api/diaries" si hiciste proxy; si no, la absoluta.
-const BASE_URL = "http://localhost:3000/api/diaries";
+const BASE_URL = "http://localhost:3000/api/diaries"; // o "/api/diaries" si usas proxy
 
 export async function getAll(): Promise<DiaryEntry[]> {
   const res = await fetch(BASE_URL);
@@ -13,7 +12,6 @@ export async function getAll(): Promise<DiaryEntry[]> {
 }
 
 export async function create(entry: NewDiaryEntry): Promise<DiaryEntry> {
-  console.log("POST body:", entry); // 👈 para ver lo que envías
   const res = await fetch(BASE_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -21,9 +19,17 @@ export async function create(entry: NewDiaryEntry): Promise<DiaryEntry> {
   });
 
   if (!res.ok) {
-    // lee el mensaje que devuelve el backend
-    const text = await res.text();
-    throw new Error(`POST failed: ${res.status} ${text}`);
+    // Intentamos extraer el motivo del backend
+    let reason = `${res.status} ${res.statusText}`;
+    try {
+      const { error } = (await res.json()) as { error?: string };
+      if (error) reason = error;
+    } catch {
+      const text = await res.text().catch(() => "");
+      if (text) reason = text;
+    }
+    throw new Error(reason);
   }
+
   return (await res.json()) as DiaryEntry;
 }
