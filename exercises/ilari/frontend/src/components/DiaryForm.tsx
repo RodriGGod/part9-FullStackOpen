@@ -1,10 +1,9 @@
+// src/components/DiaryForm.tsx
 import { useState } from "react";
 import { NewDiaryEntry, Visibility, Weather } from "../types";
 
 type Props = {
   onCreate: (entry: NewDiaryEntry) => Promise<void>;
-
-  
 };
 
 export default function DiaryForm({ onCreate }: Props) {
@@ -13,15 +12,20 @@ export default function DiaryForm({ onCreate }: Props) {
   const [weather, setWeather] = useState<Weather>(Weather.Sunny);
   const [comment, setComment] = useState<string>("");
 
-  const submit = async (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await onCreate({
+
+    // comment opcional: no lo envíes si está vacío
+    const payload: NewDiaryEntry = {
       date,
       visibility,
       weather,
-      comment: comment || undefined,
-    });
-    // limpia el formulario
+      ...(comment.trim() ? { comment: comment.trim() } : {}),
+    };
+
+    await onCreate(payload);
+
+    // reset
     setDate("");
     setVisibility(Visibility.Good);
     setWeather(Weather.Sunny);
@@ -29,9 +33,9 @@ export default function DiaryForm({ onCreate }: Props) {
   };
 
   return (
-    <form onSubmit={submit} style={{ display: "grid", gap: 10 }}>
+    <form onSubmit={submit} style={{ display: "grid", gap: 12 }}>
       <label>
-        Fecha
+        date
         <input
           type="date"
           value={date}
@@ -40,10 +44,10 @@ export default function DiaryForm({ onCreate }: Props) {
         />
       </label>
 
-      <fieldset>
-        <legend>Visibility</legend>
+      <fieldset style={{ border: "none", padding: 0 }}>
+        <legend>visibility</legend>
         {Object.values(Visibility).map((v) => (
-          <label key={v} style={{ marginRight: 8 }}>
+          <label key={v} style={{ marginRight: 10 }}>
             <input
               type="radio"
               name="visibility"
@@ -51,15 +55,15 @@ export default function DiaryForm({ onCreate }: Props) {
               checked={visibility === v}
               onChange={() => setVisibility(v)}
             />
-            {v}
+            {" "}{v}
           </label>
         ))}
       </fieldset>
 
-      <fieldset>
-        <legend>Weather</legend>
+      <fieldset style={{ border: "none", padding: 0 }}>
+        <legend>weather</legend>
         {Object.values(Weather).map((w) => (
-          <label key={w} style={{ marginRight: 8 }}>
+          <label key={w} style={{ marginRight: 10 }}>
             <input
               type="radio"
               name="weather"
@@ -67,22 +71,22 @@ export default function DiaryForm({ onCreate }: Props) {
               checked={weather === w}
               onChange={() => setWeather(w)}
             />
-            {w}
+            {" "}{w}
           </label>
         ))}
       </fieldset>
 
       <label>
-        Comentario (opcional)
+        comment (optional)
         <input
           type="text"
           value={comment}
           onChange={(e) => setComment(e.target.value)}
-          placeholder="p.ej. crosswind"
+          placeholder="e.g. crosswind"
         />
       </label>
 
-      <button type="submit">Añadir</button>
+      <button type="submit">add</button>
     </form>
   );
 }
