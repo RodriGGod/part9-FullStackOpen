@@ -5,6 +5,10 @@ export interface Diagnosis {
   latin?: string;
 }
 
+export interface DiagnoseEntry{
+  
+}
+
 // Base para todas las entradas
 export interface BaseEntry {
   id: string;
