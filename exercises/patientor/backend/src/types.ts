@@ -5,20 +5,16 @@ export interface Diagnosis {
   latin?: string;
 }
 
-export interface DiagnoseEntry{
-  
-}
-
-// Base para todas las entradas
+// Base entry
 export interface BaseEntry {
   id: string;
   description: string;
-  date: string;        // ISO yyyy-mm-dd
+  date: string;              // ISO yyyy-mm-dd
   specialist: string;
   diagnosisCodes?: Array<Diagnosis['code']>;
 }
 
-// Tipos específicos de entrada
+// Specific fields
 export interface Discharge {
   date: string;
   criteria: string;
@@ -36,6 +32,7 @@ export enum HealthCheckRating {
   CriticalRisk = 3
 }
 
+// Concrete entries
 export interface HealthCheckEntry extends BaseEntry {
   type: 'HealthCheck';
   healthCheckRating: HealthCheckRating;
@@ -52,13 +49,22 @@ export interface HospitalEntry extends BaseEntry {
   discharge: Discharge;
 }
 
-// Unión discriminada
+// Discriminated union
 export type Entry =
   | HospitalEntry
   | OccupationalHealthcareEntry
   | HealthCheckEntry;
 
-// Pacientes
+// ✅ “truco” correcto: union de cada tipo sin 'id'
+export type NewHealthCheckEntry = Omit<HealthCheckEntry, 'id'>;
+export type NewOccupationalHealthcareEntry = Omit<OccupationalHealthcareEntry, 'id'>;
+export type NewHospitalEntry = Omit<HospitalEntry, 'id'>;
+export type NewEntry =
+  | NewHospitalEntry
+  | NewOccupationalHealthcareEntry
+  | NewHealthCheckEntry;
+
+// Patients
 export enum Gender {
   Male = 'male',
   Female = 'female',
@@ -76,7 +82,4 @@ export interface Patient {
 }
 
 export type NewPatient = Omit<Patient, 'id' | 'entries'>;
-
-
-// Para listar sin datos sensibles
 export type NonSensitivePatient = Omit<Patient, 'ssn' | 'entries'>;

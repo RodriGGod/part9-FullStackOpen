@@ -1,20 +1,6 @@
-import diagnoseData from '../data/diagnosesData';
-import { DiagnoseEntryWithoutLatin } from '../types';
+import diagnoses from '../data/diagnosesData'; // tu dataset de diagnósticos
+import { Diagnosis } from '../types';
 
-import { DiagnoseEntry } from '../types';
+const getDiagnoses = (): Diagnosis[] => diagnoses;
 
-const getDiagnoses = (): DiagnoseEntry[] => {
-    return diagnoseData;
-};
-
-const getNonLatinDiagnoses = (): DiagnoseEntryWithoutLatin[] => {
-    return diagnoseData.map(({ code, name }) => ({
-        code,
-        name
-    }));
-};
-
-export default {
-    getDiagnoses,
-    getNonLatinDiagnoses
-};
+export default { getDiagnoses };
