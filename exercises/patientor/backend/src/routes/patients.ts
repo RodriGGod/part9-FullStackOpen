@@ -5,9 +5,9 @@ import toNewPatient from '../utils';
 
 const router = express.Router();
 
-// Opcional: endpoint sin SSN para el frontend (lista pública)
+
 router.get('/', (_req, res) => {
-  res.json(patientService.getNonSensitivePatients());
+  return res.json(patientService.getAllNonSensitive());
 });
 
 
@@ -30,12 +30,8 @@ router.post('/', (req, res) => {
 });
 
 router.get('/:id', (req, res) => {
-  const patient = patientService.getPatientById(req.params.id);
-  if (!patient) {
-    res.status(404).json({ error: 'Patient not found' });
-    return; // simplemente cortamos la ejecución
-  }
-  res.json(patient);
+  const p = patientService.getPatientById(req.params.id);
+  if (!p) return res.status(404).json({ error: 'Patient not found' });
+  return res.json(p);
 });
-
 export default router;
