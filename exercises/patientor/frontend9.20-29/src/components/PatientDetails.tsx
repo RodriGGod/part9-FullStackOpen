@@ -5,12 +5,11 @@ import {
   Patient,
   Entry,
   Diagnosis,
-  HealthCheckEntry,
-  HealthCheckRating,
+  NewEntryFormValues,
 } from '../types';
-import { addHealthCheckEntry } from '../services/patients';
-import AddHealthCheckForm from './AddHealthCheckForm';
-import EntryDetails from './EntryDetails'; // si ya lo tienes del 9.25
+import { addEntry } from '../services/patients';
+import AddEntryForm from './AddEntryForm';
+import EntryDetails from './EntryDetails';
 
 export default function PatientDetails() {
   const { id } = useParams();
@@ -19,6 +18,7 @@ export default function PatientDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+ 
   useEffect(() => {
     if (!id) return;
     (async () => {
@@ -26,24 +26,26 @@ export default function PatientDetails() {
         const { data } = await axios.get<Patient>(`http://localhost:3001/api/patients/${id}`);
         setPatient(data);
       } catch (e: any) {
-        setError(e?.response?.data?.error ?? e?.message ?? 'Error');
+        setError(e?.response?.data?.error ?? e?.message ?? 'Error loading patient');
       } finally {
         setLoading(false);
       }
     })();
   }, [id]);
 
+  
   useEffect(() => {
     (async () => {
       try {
         const { data } = await axios.get<Diagnosis[]>('http://localhost:3001/api/diagnoses');
         setDiagnoses(data);
       } catch {
-        // opcional: mostrar aviso
+        // opcional: manejar error silencioso
       }
     })();
   }, []);
 
+  
   const diagMap = useMemo(
     () => Object.fromEntries(diagnoses.map(d => [d.code, d])),
     [diagnoses]
@@ -53,14 +55,9 @@ export default function PatientDetails() {
   if (error) return <p style={{ color: 'crimson' }}>{error}</p>;
   if (!patient || !id) return <p>Not found</p>;
 
-  const handleAdd = async (form: {
-    description: string;
-    date: string;
-    specialist: string;
-    healthCheckRating: HealthCheckRating;
-    diagnosisCodes?: string[];
-  }) => {
-    const created: HealthCheckEntry = await addHealthCheckEntry(id, form);
+  // Handler para crear cualquier tipo de Entry
+  const handleAdd = async (values: NewEntryFormValues) => {
+    const created: Entry = await addEntry(id, values);
     setPatient(prev => (prev ? { ...prev, entries: [created, ...prev.entries] } : prev));
   };
 
@@ -74,17 +71,17 @@ export default function PatientDetails() {
       <p>occupation: {patient.occupation}</p>
       <p>date of birth: {patient.dateOfBirth}</p>
 
-      {/* 9.27 — Formulario para añadir HealthCheck */}
-      <AddHealthCheckForm onSubmit={handleAdd} />
+      
+      <AddEntryForm diagnoses={diagnoses} onSubmit={handleAdd} />
 
       <h3>entries</h3>
       {patient.entries.length === 0 ? (
         <p>No entries yet.</p>
       ) : (
         <ul style={{ paddingLeft: 18 }}>
-          {patient.entries.map((e: Entry) =>
+          {patient.entries.map((e: Entry) => (
             <EntryDetails key={e.id} entry={e} diagMap={diagMap} />
-          )}
+          ))}
         </ul>
       )}
     </div>

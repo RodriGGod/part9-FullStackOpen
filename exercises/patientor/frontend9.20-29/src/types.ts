@@ -66,4 +66,19 @@ export interface Patient {
   entries: Entry[];
 }
 
+export type NewEntryFormValues =
+  | ({
+    type: 'HealthCheck';
+    healthCheckRating: HealthCheckRating;
+  } & Omit<BaseEntry, 'id'>)
+  | ({
+    type: 'Hospital';
+    discharge: { date: string; criteria: string };
+  } & Omit<BaseEntry, 'id'>)
+  | ({
+    type: 'OccupationalHealthcare';
+    employerName: string;
+    sickLeave?: { startDate: string; endDate: string };
+  } & Omit<BaseEntry, 'id'>);
+
 export type NonSensitivePatient = Omit<Patient, 'ssn' | 'entries'>;

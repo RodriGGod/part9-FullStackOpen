@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { NonSensitivePatient, Patient, HealthCheckEntry, HealthCheckRating} from '../types'
+import { NonSensitivePatient, Patient, HealthCheckEntry, HealthCheckRating, NewEntryFormValues, Entry} from '../types'
 
 
 const api = axios.create({
@@ -31,5 +31,13 @@ export async function addHealthCheckEntry(
     `/patients/${patientId}/entries`,
     { type: 'HealthCheck', ...payload }
   );
+  return data;
+}
+
+export async function addEntry(
+  patientId: string,
+  payload: NewEntryFormValues
+): Promise<Entry> {
+  const { data } = await api.post<Entry>(`/patients/${patientId}/entries`, payload);
   return data;
 }
