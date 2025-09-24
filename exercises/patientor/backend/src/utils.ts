@@ -115,3 +115,4 @@ export const toNewEntry = (obj: unknown): NewEntry => {
       throw new Error(`Unknown entry type: ${type}`);
   }
 };
+
