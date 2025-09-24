@@ -10,10 +10,12 @@ router.get('/', (_req, res) => {
   res.json(patientService.getNonSensitivePatients());
 });
 
-// Si quieres exponer todos (con ssn) para debug:
-// router.get('/all', (_req, res) => {
-//   res.json(patientService.getPatients());
-// });
+
+router.get('/all', (_req, res) => {
+   res.json(patientService.getPatients());
+});
+
+
 
 router.post('/', (req, res) => {
   try {
@@ -25,6 +27,15 @@ router.post('/', (req, res) => {
     if (e instanceof Error) msg += ' Error: ' + e.message;
     res.status(400).send(msg);
   }
+});
+
+router.get('/:id', (req, res) => {
+  const patient = patientService.getPatientById(req.params.id);
+  if (!patient) {
+    res.status(404).json({ error: 'Patient not found' });
+    return; // simplemente cortamos la ejecución
+  }
+  res.json(patient);
 });
 
 export default router;

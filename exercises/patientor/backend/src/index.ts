@@ -1,17 +1,19 @@
-// src/index.ts
 import express from 'express';
+import cors from 'cors';
 import patientsRouter from './routes/patients';
-import diagnosesRouter from './routes/diagnoses'; // si ya lo tienes
 
 const app = express();
-app.use(express.json()); // ¡importante para leer req.body JSON!
+app.use(cors());
+app.use(express.json());
 
-app.get('/api/ping', (_req, res) => {
-  res.send('pong');
-});
+// Ruta de prueba para verificar que el server responde
+app.get('/healthz', (_req, res) => res.send('ok'));
 
+// Montamos el router de pacientes
 app.use('/api/patients', patientsRouter);
-app.use('/api/diagnoses', diagnosesRouter); // si procede
+
+// 404 por defecto
+app.use((_req, res) => res.status(404).json({ error: 'not found' }));
 
 const PORT = 3001;
 app.listen(PORT, () => {

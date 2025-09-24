@@ -13,17 +13,21 @@ export enum Gender {
   Other = 'other'
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface Entry {}
+
 export interface Patient {
   id: string;
   name: string;
-  dateOfBirth: string;  // ISO date string
   ssn: string;
-  gender: Gender;
   occupation: string;
+  gender: Gender;
+  dateOfBirth: string;
+  entries: Entry[];        
 }
 
-// Lo que recibe el POST (sin id)
-export type NewPatient = Omit<Patient, 'id'>;
+export type NonSensitivePatient = Omit<Patient, 'ssn' | 'entries'>;
 
-// Para listar sin datos sensibles
-export type NonSensitivePatient = Omit<Patient, 'ssn'>;
+export type NewPatient = Omit<Patient, 'id' | 'entries'>;
+
+

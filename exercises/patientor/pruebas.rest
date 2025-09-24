@@ -1,13 +1,3 @@
-### Crear un paciente nuevo
-POST http://localhost:3001/api/patients
-Content-Type: application/json
-
-{
-  "name": "Sarah Connor",
-  "dateOfBirth": "1979-05-12",
-  "ssn": "120579-ABC",
-  "gender": "female",
-  "occupation": "Waitress"
-}
+GET http://localhost:3001/api/patients/d2773336-f723-11e9-8f0b-362b9e155667
 
 
