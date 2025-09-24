@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import axios from 'axios';
-import { Patient, Entry, Diagnosis } from '../types';
+import { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import axios from "axios";
+import { Patient, Diagnosis } from "../types";
+import EntryDetails from "./EntryDetails";
+import { useMemo } from "react";
 
 export default function PatientDetails() {
   const { id } = useParams();
@@ -15,10 +17,14 @@ export default function PatientDetails() {
     if (!id) return;
     (async () => {
       try {
-        const { data } = await axios.get<Patient>(`http://localhost:3001/api/patients/${id}`);
+        const { data } = await axios.get<Patient>(
+          `http://localhost:3001/api/patients/${id}`
+        );
         setPatient(data);
       } catch (e: any) {
-        setError(e?.response?.data?.error ?? e?.message ?? 'Error cargando paciente');
+        setError(
+          e?.response?.data?.error ?? e?.message ?? "Error cargando paciente"
+        );
       } finally {
         setLoading(false);
       }
@@ -29,7 +35,9 @@ export default function PatientDetails() {
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await axios.get<Diagnosis[]>('http://localhost:3001/api/diagnoses');
+        const { data } = await axios.get<Diagnosis[]>(
+          "http://localhost:3001/api/diagnoses"
+        );
         setDiagnoses(data);
       } catch {
         // Silenciamos el error en el ejercicio; si quieres, muestra un aviso
@@ -37,17 +45,24 @@ export default function PatientDetails() {
     })();
   }, []);
 
-  const nameOf = (code: string) =>
-    diagnoses.find(d => d.code === code)?.name ?? '';
+  const diagMap = useMemo(
+    () => Object.fromEntries(diagnoses.map((d) => [d.code, d])),
+    [diagnoses]
+  );
+
+
+  
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <p style={{ color: 'crimson' }}>{error}</p>;
+  if (error) return <p style={{ color: "crimson" }}>{error}</p>;
   if (!patient) return <p>Not found</p>;
 
   return (
     <div>
       <h1>Patientor</h1>
-      <Link to="/"><button>HOME</button></Link>
+      <Link to="/">
+        <button>HOME</button>
+      </Link>
 
       <h2 style={{ marginTop: 24 }}>{patient.name}</h2>
       <p>ssn: {patient.ssn}</p>
@@ -59,20 +74,8 @@ export default function PatientDetails() {
         <p>No entries yet.</p>
       ) : (
         <ul style={{ paddingLeft: 18 }}>
-          {patient.entries.map((e: Entry) => (
-            <li key={e.id} style={{ marginBottom: 12, border: '1px solid #ddd', borderRadius: 8, padding: 12 }}>
-              <div><b>{e.date}</b> <em>{e.description}</em></div>
-
-              {e.diagnosisCodes && e.diagnosisCodes.length > 0 && (
-                <ul style={{ marginTop: 8 }}>
-                  {e.diagnosisCodes.map(code => (
-                    <li key={code}>
-                      {code} {nameOf(code) ? `— ${nameOf(code)}` : ''}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
+          {patient.entries.map((e) => (
+            <EntryDetails key={e.id} entry={e} diagMap={diagMap} />
           ))}
         </ul>
       )}
